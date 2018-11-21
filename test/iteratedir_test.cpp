@@ -99,7 +99,8 @@ int main(int argc, char **argv){
 		st.change = getModTime(st.strPathName);
 		printHead(&st);
 	}
-	print("git test");
+	printf("test vs");
+	printf("git test");
 	return 0;
 }
 
