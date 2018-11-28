@@ -101,7 +101,6 @@ int main(int argc, char **argv){
 	}
 	printf("test vs");
 	printf("git test");
-	printf("123")
 	printf("write")
 	return 0;
 }
