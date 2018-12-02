@@ -77,13 +77,29 @@ void iterateDir(char *inPathName, std::vector<std::string>&vec){
 		;
 }
 
-
+void getHeadInfo(vector<struct Head>& vecHeads, const vector<string>& vecPaths){
+	struct Head tmpHead;
+	for (auto &i:vecPaths){
+		memset(tmpHead.strPathName, 0, 128);
+		memcpy(tmpHead.strPathName, i.c_str(), strlen(i.c_str()));
+		vecHeads.push_back(tmpHead);
+	}
+	for (auto &st:vecHeads){
+		st.fileSize = getFileSize(st.strPathName);
+		st.change = getModTime(st.strPathName);
+		st.lastSync = 0;
+		printHead(&st);
+	}
+}
 
 int main(int argc, char **argv){
-	std::vector<std::string> vecPath;
+	vector<std::string> vecPath;
 	vector<struct Head> vecHead;
 	struct Head tmpHead;
 	iterateDir(argv[1], vecPath);
+
+	getHeadInfo(vecHead , vecPath);
+	/*
 	for (auto &i:vecPath){
 		//std::cout << i << std::endl;
 		memset(tmpHead.strPathName, 0, 128);
@@ -98,13 +114,8 @@ int main(int argc, char **argv){
 		printf("Size: %ld\n", getFileSize(st.strPathName));
 		st.change = getModTime(st.strPathName);
 		printHead(&st);
-	}
-	printf("test vs");
-	printf("git test");
-	printf("123")
-	printf("234")
-	printf("aaaaaaaaaa")
-	printf("write")
+	}*/
+
 	return 0;
 }
 

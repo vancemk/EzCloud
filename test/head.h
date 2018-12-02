@@ -14,8 +14,8 @@ void printHead(struct Head *phead){
 	printf("phead->strMd5: %s\n", phead->strMd5);
 	printf("phead->strPathName: %s\n", phead->strPathName);
 	printf("phead->fileSize: %ld\n", phead->fileSize);
-	printf("phead->strPathName: %d\n", phead->change);
-	printf("phead->strPathName: %d\n", phead->lastSync);
+	printf("phead->change: %d\n", phead->change);
+	printf("phead->lastSync: %d\n\n", phead->lastSync);
 }
 
 
