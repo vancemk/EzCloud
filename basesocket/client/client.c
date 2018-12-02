@@ -65,14 +65,14 @@ int main(int argc,char **argv)
 	testHead.strMd5[32] = 0;
 	testHead.strPathName[5]= 0;
 
-	printf("ptr #####: %p\n", &(testHead.strMd5));
+	// printf("ptr #####: %p\n", &(testHead.strMd5));
 	// binary write struct to dbuf
 	dbuf.writeBytes((void *)&testHead, sizeof(testHead));
 
     while(1)
     {
 		int len = dbuf.getDataLen();
-		printf("Data Len: %d\n", len);
+		// printf("Data Len: %d\n", len);
         if(len == 0)
             break;
 
@@ -81,7 +81,7 @@ int main(int argc,char **argv)
         while(1)
         {
             int ret = write(sockfd, dbuf.getData()+_tmp, len - _tmp);
-			printf("write: %d\n", ret);
+			// printf("write: %d\n", ret);
             if(ret > 0 )
                 _tmp += ret;
             if(_tmp == ret)
@@ -97,11 +97,11 @@ int main(int argc,char **argv)
 			break;
 
     }
-	printf("dbuf.getData: %s\n", dbuf.getData());
-	printf("dbuf.getDataLen: %d\n", dbuf.getDataLen());
+	// printf("dbuf.getData: %s\n", dbuf.getData());
+	// printf("dbuf.getDataLen: %d\n", dbuf.getDataLen());
 	dbuf.readBytes((void *)&rHead, sizeof(testHead));
 	printHead(&rHead);
-	printf("ptr #####: %p\n", &(rHead.strMd5));
+	// printf("ptr #####: %p\n", &(rHead.strMd5));
     close(sockfd);
     return 0;
  }

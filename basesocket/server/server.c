@@ -80,7 +80,6 @@ int main(int argc,char **argv)
     {
         len = sizeof(cliaddr);
         accefd = accept(sockfd,(struct sockaddr *)&cliaddr,&len);
-		printf("accefd: %d\n", accefd);
         if(accefd < 0)
         {
             if(errno == EINTR)  //判断阻塞等待客户端的链接;是被信号打断还是其它因素
@@ -91,11 +90,9 @@ int main(int argc,char **argv)
         while(1)
         {
 			dbuf.ensureFree(READ_WRITE_SIZE);
-			printf("dbuf.getFreeLen: %d\n", dbuf.getFreeLen());
             //int leng = read(accefd, dbuf.getFree(), sizeof(testHead));
             int leng = read(accefd, dbuf.getFree(), dbuf.getFreeLen());
 			dbuf.pourData(leng);
-			printf("socket read data: %d\n", leng);
             if(leng == 0)
             {
                 printf("Opposite have close the socket.\n"); 
@@ -105,9 +102,6 @@ int main(int argc,char **argv)
                 continue;
             if(leng == -1 )
                 break; //表示出现了严重的错误
-			printf("dbuf.getDataLen: %d\n", dbuf.getDataLen());
-			printf("dbuf.getData: %s\n", dbuf.getData());
-			printf("sizeof testHead: %ld\n", sizeof(testHead));
 			//printf("read success: %g?\n", dbuf.readBytes((void *)&testHead, sizeof(testHead)));
 			dbuf.readBytes((void *)&testHead, sizeof(testHead));
 			printHead(&testHead);
