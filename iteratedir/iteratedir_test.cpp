@@ -11,8 +11,10 @@
 #include <iostream>
 
 #include "head.h"
+#include "md5val.h"
 
 struct Head;
+char * print_md5_sum(const char *sFileName, char md5Str[]) ;
 using namespace std;
 
 unsigned long getFileSize(const char *sFileName){
@@ -87,6 +89,7 @@ void getHeadInfo(vector<struct Head>& vecHeads, const vector<string>& vecPaths){
 	for (auto &st:vecHeads){
 		st.fileSize = getFileSize(st.strPathName);
 		st.change = getModTime(st.strPathName);
+		print_md5_sum(st.strPathName, st.strMd5) ;
 		st.lastSync = 0;
 		printHead(&st);
 	}
@@ -97,24 +100,7 @@ int main(int argc, char **argv){
 	vector<struct Head> vecHead;
 	struct Head tmpHead;
 	iterateDir(argv[1], vecPath);
-
 	getHeadInfo(vecHead , vecPath);
-	/*
-	for (auto &i:vecPath){
-		//std::cout << i << std::endl;
-		memset(tmpHead.strPathName, 0, 128);
-		memcpy(tmpHead.strPathName, i.c_str(), strlen(i.c_str()));
-		vecHead.push_back(tmpHead);
-	}
-	cout << vecHead.size() << endl;
-	for (auto &st:vecHead){
-		printf("path: %s\n", st.strPathName);
-		st.fileSize = getFileSize(st.strPathName);
-		printf("Size: %ld\n", st.fileSize);
-		printf("Size: %ld\n", getFileSize(st.strPathName));
-		st.change = getModTime(st.strPathName);
-		printHead(&st);
-	}*/
 
 	return 0;
 }
