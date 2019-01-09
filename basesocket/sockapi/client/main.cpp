@@ -54,7 +54,6 @@ int main(int argc,char **argv)
     while(1)
     {
 		int len = dbuf.getDataLen();
-		// printf("Data Len: %d\n", len);
         if(len == 0)
             break;
 
