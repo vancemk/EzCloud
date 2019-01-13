@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#ifndef HEAD_H_
+#define HEAD_H_
 
 struct Head {
 	char strMd5[40];
@@ -21,4 +23,18 @@ void printHead(struct Head *phead){
 	printf("phead->isNextFile: %d\n\n", phead->isNextFile);
 }
 
+struct Head getHead() {
+	struct Head temp;
+	memcpy(temp.strMd5," 9403e3a5a8fd7b698553e9f0b711cf8d", 32);
+	memcpy(temp.strPathName, "/home/Git/EzCloud/databuffer/test_void_convert_struct/databuffer.h", 66);
+	temp.fileSize = 10822;
+	temp.change = 1542813349;
+	temp.lastSync =  0;
+	return temp;
+}
+
+
+
+
+#endif
 

@@ -60,7 +60,7 @@ int main(int argc,char **argv)
         sys_err("listen",-3);
     }
 	
-	char buf[64];
+	char buf[128];
 	memset(buf, 0, 64);
     while(1)
     {
@@ -78,7 +78,8 @@ int main(int argc,char **argv)
             int leng = read(accefd, buf, 100);
 			printf("%s\n", (char *)buf);
 			printf("read %d\n", leng);
-			memset(buf, 0, 20);
+			sleep(3);
+			memset(buf, 0, 100);
         }
 
         //若文件的读写已经结束,则关闭文件描述符

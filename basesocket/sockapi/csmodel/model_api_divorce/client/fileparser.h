@@ -14,9 +14,31 @@
 #define SERV_PORT 8000
 
 #include "databuffer.h"
+#include "head.h"
 
 #ifndef FILEPARSER_H_
 #define FILEPARSER_H_
+
+#define HEAD_SIZE 192
+
+
+/** 
+ *  @brief 将缓冲区所有数据写入套接字
+ *  @param pdbuf	缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
+void writeAll(DataBuffer & pdbuf, const int pconfd) {
+    int lenwt = 0;
+    while (1) {
+        int lenwt = write(pconfd, (void *)pdbuf.getData(), 
+               pdbuf.getDataLen());
+        pdbuf.stripData(lenwt);
+        if(0 == pdbuf.getDataLen())
+            break;
+    }   
+}   
 
 
 /** 
@@ -27,12 +49,12 @@
  *
  *  @return void 
  */
-void writeHead(struct Head * phead, DataBuffer & pdbf, const int pconfd) {
-	if (pbuf.getFreeLen() < 0){
-		return -1;
+void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
+	if (pdbuf.getFreeLen() < 0){
+		exit(-1);
 	}
-	int offset = pdbuf.getFreeLen >= HEAD_SIZE ? HEAD_SIZE : pdbuf.getFreeLen();
-	if (pdbuf.getFreeLen >= HEAD_SIZE) {
+	int offset = pdbuf.getFreeLen() >= HEAD_SIZE ? HEAD_SIZE : pdbuf.getFreeLen();
+	if (pdbuf.getFreeLen() >= HEAD_SIZE) {
 		pdbuf.writeBytes(phead, HEAD_SIZE);	
 		return;
 	}
@@ -53,11 +75,11 @@ void writeHead(struct Head * phead, DataBuffer & pdbf, const int pconfd) {
  *
  *  @return void 
  */
-void writeFile(struct Head * phead, DataBuffer & pdbf, const int pconfd) {
-	if (pbuf.getFreeLen() < 0){
-		return -1;
+void writeFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
+	if (pdbuf.getFreeLen() < 0){
+		exit(-1);
 	}
-	int tfd = open(pthed->sFileName, O_RDONLY);
+	int tfd = open(phead->strPathName, O_RDONLY);
 	int lenrd = 0;
 	if (tfd < 0)
 		exit(-1);
@@ -71,24 +93,6 @@ void writeFile(struct Head * phead, DataBuffer & pdbf, const int pconfd) {
 	}
 }
 
-
-/** 
- *  @brief 将缓冲区所有数据写入套接字
- *  @param pdbuf	缓冲区
- *  @param pconfd	打开的连接套接字
- *
- *  @return void 
- */
-void writeAll(DataBuffer & pdbuf, const int pconfd) {
-    int lenwt = 0;
-    while (1) {
-        int lenwt = write(pconfd, (void *)pdbuf.getData(), 
-               pdbuf.getDataLen());
-        pdbuf.stripData(lenwt);
-        if(0 == pdbuf.getDataLen())
-            break;
-    }   
-}   
 
 
 
