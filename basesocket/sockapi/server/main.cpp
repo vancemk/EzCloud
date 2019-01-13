@@ -40,12 +40,6 @@ int main(int argc,char **argv)
 
     bzero(&cliaddr,sizeof(cliaddr));
 
-    //socket
-    sockfd = socket(AF_INET,SOCK_STREAM,0);
-    if(sockfd < 0)
-    {
-        sys_err("socket",-1);
-    }
 
 	//init databuffer
 	DataBuffer dbuf;
