@@ -26,6 +26,15 @@ int main(void) {
 	return 0;
 }
 
+
+/** 
+ *  @brief 向缓冲区写入头信息
+ *  @param phead	头信息结构指针
+ *  @param pdbuf    缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
 void writeHead(struct Head * phead, DataBuffer & pdbf, const int pconfd) {
 	if (pbuf.getFreeLen() < 0){
 		return -1;
@@ -38,15 +47,57 @@ void writeHead(struct Head * phead, DataBuffer & pdbf, const int pconfd) {
 	else {
 		pdbuf.writeBytes(phead, offset);
 	}
-	int datawt = write(pconfd, (void *)pdbuf.getData(), pdbuf.getDataLen());
-	pdbuf.clear();
+	writeAll(pdbuf, pconfd); 
 	pdbuf.writeBytes(phead+offset, HEAD_SIZE-offset);
 	return;
 }
 
-void writeAll(DataBuffer & pdbuf, const pconfd) {
-	;
-}	
+
+/** 
+ *  @brief 向缓冲区写入文件信息
+ *  @param phead	头信息结构指针
+ *  @param pdbuf    缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
+void writeFile(struct Head * phead, DataBuffer & pdbf, const int pconfd) {
+	if (pbuf.getFreeLen() < 0){
+		return -1;
+	}
+	int tfd = open(pthed->sFileName, O_RDONLY);
+	int lenrd = 0;
+	if (tfd < 0)
+		exit(-1);
+	while (1) {
+		lenrd = read(tfd, (void *)pdbuf.getFree(), 
+				pdbuf.getFreeLen());
+		pdbuf.pourData(lenrd);
+		if (0 ==  lenrd && pdbuf.getFreeLen() != 0)
+			break;
+		writeAll(pdbuf, pconfd); 
+	}
+}
+
+
+/** 
+ *  @brief 将缓冲区所有数据写入套接字
+ *  @param pdbuf	缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
+void writeAll(DataBuffer & pdbuf, const int pconfd) {
+    int lenwt = 0;
+    while (1) {
+        int lenwt = write(pconfd, (void *)pdbuf.getData(), 
+               pdbuf.getDataLen());
+        pdbuf.stripData(lenwt);
+        if(0 == pdbuf.getDataLen())
+            break;
+    }   
+}   
+
 
 
 
