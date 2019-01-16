@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+
 struct Head {
 	char strMd5[40];
 	char strPathName[128];
