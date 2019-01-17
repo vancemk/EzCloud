@@ -21,8 +21,12 @@
 #define IP "127.0.0.1"
 #define SERV_PORT 8000
 
+#include <string>
+#include <vector>
+
 #include "databuffer.h"
 #include "head.h"
+#include "headhandle.h"
 #include "fileparser.h"
 #include "sockcli.h"
 
@@ -33,6 +37,8 @@ void sys_err(const char *ptr,int num)
     perror(ptr);
     exit(num);
 } */
+
+using namespace std;
 
 void writeAll(DataBuffer & pdbuf, const int pconfd) ;
 int main(int argc,char **argv)
@@ -45,12 +51,15 @@ int main(int argc,char **argv)
 	printf("dbuf.getDataLen: %d\n", dbuf.getDataLen());
 	printf("dbuf.getFreeLen: %d\n", dbuf.getFreeLen());
 	
-	struct Head thead = getHead();
-	printHead(&thead);
-
-	writeHead(&thead, dbuf, sockfd);
-	writeFile(&thead, dbuf, sockfd);
-
+	vector<std::string> vecPath;
+	vector<struct Head> vecHead;
+	iterateDir(argv[1], vecPath);
+	getHeadInfo(vecHead, vecPath);
+	
+	for (auto i=0; i<vecHead.size(); i++){
+		writeHead(&vecHead[i], dbuf, sockfd);
+		writeFile(&vecHead[i], dbuf, sockfd);
+	}
 
     close(sockfd);
     return 0;

@@ -71,6 +71,20 @@ void readAll(DataBuffer & pdbuf, const int pconfd) {
  *
  *  @return void 
  */
+void readHead(struct Head & rhead, DataBuffer & pdbuf) {
+	struct Head *thead = (struct Head *)pdbuf.getData();
+	return;
+}
+
+
+/** 
+ *  @brief 向缓冲区写入头信息
+ *  @param phead	头信息结构指针
+ *  @param pdbuf    缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
 void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 	if (pdbuf.getFreeLen() < 0){
 		exit(-1);
