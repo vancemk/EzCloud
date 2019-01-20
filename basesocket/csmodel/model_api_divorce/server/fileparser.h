@@ -32,7 +32,7 @@
 void writeAll(DataBuffer & pdbuf, const int pconfd) {
     int lenwt = 0;
     while (1) {
-        int lenwt = write(pconfd, (void *)pdbuf.getData(), 
+        lenwt = write(pconfd, (void *)pdbuf.getData(), 
                pdbuf.getDataLen());
         pdbuf.stripData(lenwt);
         if(0 == pdbuf.getDataLen())
@@ -64,7 +64,7 @@ void readAll(DataBuffer & pdbuf, const int pconfd) {
 
 
 /** 
- *  @brief 向缓冲区写入头信息
+ *  @brief 从缓冲区获取头信息
  *  @param phead	头信息结构指针
  *  @param pdbuf    缓冲区
  *  @param pconfd	打开的连接套接字
@@ -73,6 +73,12 @@ void readAll(DataBuffer & pdbuf, const int pconfd) {
  */
 void readHead(struct Head & rhead, DataBuffer & pdbuf) {
 	struct Head *thead = (struct Head *)pdbuf.getData();
+	memcpy(rhead.strMd5, thead->strMd5, 40);
+	memcpy(rhead.strPathName, thead->strPathName, 128);
+	rhead.fileSize = thead -> fileSize;
+	rhead.change= thead -> change;
+	rhead.lastSync = thead -> lastSync;
+	rhead.isNextFile = thead -> isNextFile;
 	return;
 }
 

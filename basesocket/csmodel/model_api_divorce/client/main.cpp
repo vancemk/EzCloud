@@ -58,7 +58,7 @@ int main(int argc,char **argv)
 	
 	for (auto i=0; i<vecHead.size(); i++){
 		writeHead(&vecHead[i], dbuf, sockfd);
-		writeFile(&vecHead[i], dbuf, sockfd);
+		// writeFile(&vecHead[i], dbuf, sockfd);
 	}
 
     close(sockfd);

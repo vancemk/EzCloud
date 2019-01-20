@@ -44,6 +44,7 @@ int main(int argc,char **argv)
 
 	//init databuffer
 	DataBuffer dbuf;
+	dbuf.ensureFree(READ_WRITE_SIZE);
 	printf("db.getFreeLen(): %d\n", dbuf.getFreeLen());
 
 	// init head
@@ -62,9 +63,10 @@ int main(int argc,char **argv)
         }
         while(1)
         {
-			dbuf.ensureFree(READ_WRITE_SIZE);
 			readAll(dbuf, accefd);
-			printf("%s\n", (char *)dbuf.getData());
+			printf("dbuf: %s\n", (char *) dbuf.getData());
+			readHead(testHead, dbuf);
+			printHead(&testHead);
 			sleep(3);
 			// dbuf.pourData(leng);
         }

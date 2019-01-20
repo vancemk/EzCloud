@@ -32,9 +32,10 @@
 void writeAll(DataBuffer & pdbuf, const int pconfd) {
     int lenwt = 0;
     while (1) {
-        int lenwt = write(pconfd, (void *)pdbuf.getData(), 
+        lenwt = write(pconfd, (void *)pdbuf.getData(), 
                pdbuf.getDataLen());
-        pdbuf.stripData(lenwt);
+		printf("func writeAll write: %d\n", lenwt);
+        pdbuf.drainData(lenwt);
         if(0 == pdbuf.getDataLen())
             break;
     }   
@@ -56,13 +57,13 @@ void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 	int offset = pdbuf.getFreeLen() >= HEAD_SIZE ? HEAD_SIZE : pdbuf.getFreeLen();
 	if (pdbuf.getFreeLen() >= HEAD_SIZE) {
 		pdbuf.writeBytes(phead, HEAD_SIZE);	
-		return;
 	}
 	else {
 		pdbuf.writeBytes(phead, offset);
 	}
 	writeAll(pdbuf, pconfd); 
 	pdbuf.writeBytes(phead+offset, HEAD_SIZE-offset);
+	pdbuf.drainData(HEAD_SIZE-offset);
 	return;
 }
 

@@ -18,11 +18,13 @@
 #include<netinet/in.h>
 #include<unistd.h>
 #include<string.h>
+#include<string>
 #define SERV_PORT 8000
 
 #include "databuffer.h"
 #include "head.h"
 #include "sockser.h"
+#include "fileparser.h"
 
 struct Head;
 int getLisSock();
@@ -40,14 +42,15 @@ int main(int argc,char **argv)
 
     bzero(&cliaddr,sizeof(cliaddr));
 
-
-	//init databuffer
 	DataBuffer dbuf;
 	printf("db.getFreeLen(): %d\n", dbuf.getFreeLen());
+
+
 
 	// init head
 	struct Head testHead;
 
+	dbuf.ensureFree(READ_WRITE_SIZE);
     while(1)
     {
         len = sizeof(cliaddr);
@@ -61,23 +64,7 @@ int main(int argc,char **argv)
         }
         while(1)
         {
-			dbuf.ensureFree(READ_WRITE_SIZE);
             //int leng = read(accefd, dbuf.getFree(), sizeof(testHead));
-            int leng = read(accefd, dbuf.getFree(), dbuf.getFreeLen());
-			printf("received: %d bytes date\n", leng);
-			dbuf.pourData(leng);
-            if(leng == 0)
-            {
-                printf("Opposite have close the socket.\n"); 
-                break; //表示文件已经读到了结尾,也意味着客户端关闭了socket
-            }
-            if(leng == -1 && errno == EINTR)
-                continue;
-            if(leng == -1 )
-                break; //表示出现了严重的错误
-			//printf("read success: %g?\n", dbuf.readBytes((void *)&testHead, sizeof(testHead)));
-			dbuf.readBytes((void *)&testHead, sizeof(testHead));
-			printHead(&testHead);
         }
 
         //若文件的读写已经结束,则关闭文件描述符

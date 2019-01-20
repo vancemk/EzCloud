@@ -4,7 +4,7 @@ CXX = g++
 
 HEADER_DIR = -I .*h
 
-TARGET = client 
+TARGET = z_client 
 
 $(TARGET): $(OBJS)
 	    $(CXX) -std=c++11 -o $(TARGET) $(HEADER_DIR) $(OBJS) -lcrypto

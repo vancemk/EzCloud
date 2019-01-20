@@ -25,7 +25,7 @@
 #ifndef DATA_BUFFER_H_
 #define DATA_BUFFER_H_
 
-#define MAX_BUFFER_SIZE 2048
+#define MAX_BUFFER_SIZE 8192
 
 
 class DataBuffer {
