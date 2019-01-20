@@ -64,9 +64,11 @@ int main(int argc,char **argv)
         while(1)
         {
 			readAll(dbuf, accefd);
-			printf("dbuf: %s\n", (char *) dbuf.getData());
+			// printf("dbuf: %s\n", (char *) dbuf.getData());
 			readHead(testHead, dbuf);
 			printHead(&testHead);
+			sleep(3);
+			readFile(&testHead, dbuf, accefd);
 			sleep(3);
 			// dbuf.pourData(leng);
         }

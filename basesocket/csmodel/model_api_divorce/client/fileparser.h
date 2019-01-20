@@ -63,7 +63,6 @@ void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 	}
 	writeAll(pdbuf, pconfd); 
 	pdbuf.writeBytes(phead+offset, HEAD_SIZE-offset);
-	pdbuf.drainData(HEAD_SIZE-offset);
 	return;
 }
 
