@@ -21,59 +21,53 @@
 #define IP "127.0.0.1"
 #define SERV_PORT 8000
 
-#include <string>
-#include <vector>
-
 #include "databuffer.h"
-#include "head.h"
-#include "headhandle.h"
-#include "fileparser.h"
-#include "sockcli.h"
 
-
-/*
 void sys_err(const char *ptr,int num)
 {
     perror(ptr);
     exit(num);
-} */
-
-using namespace std;
+}
 
 void writeAll(DataBuffer & pdbuf, const int pconfd) ;
 int main(int argc,char **argv)
  {
+    // ./a.out src
+    int sockfd;
+    struct sockaddr_in addr;
 
-	int sockfd = getConSock();
+    //建立socket套接字
+    sockfd = socket(AF_INET,SOCK_STREAM,0);
+    if(sockfd < 0)
+        sys_err("socket",-1);
+
+    bzero(&addr,sizeof(addr));
+
+    //初始化ip+port
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(SERV_PORT);
+    addr.sin_addr.s_addr = inet_addr(IP);
+
+    //connect将sockfd套接字描述符与服务器端的ip+port联系起来
+    if(connect(sockfd,(struct sockaddr *)&addr,sizeof(addr)) < 0)
+        sys_err("connect",-2);
+
+
+
 
 	DataBuffer dbuf, dbuf1;
+	char buf[2048];
 	dbuf.ensureFree(2048);
+	printf("getfreelen: %d\n", dbuf.getFreeLen());
+	for(int i=0; i<2018; i++)
+		buf[i] = 'h';
+	dbuf.writeBytes((void *)buf, 2048);
+	dbuf1 = dbuf;
 	printf("dbuf.getDataLen: %d\n", dbuf.getDataLen());
 	printf("dbuf.getFreeLen: %d\n", dbuf.getFreeLen());
 	
-	vector<std::string> vecPath;
-	vector<struct Head> vecHead;
-	iterateDir(argv[1], vecPath);
-	getHeadInfo(vecHead, vecPath);
-	
-	for (auto i=0; i<vecHead.size(); i++){
-		printf("write %d\n",i);
-		writeHead(&vecHead[i], dbuf, sockfd);
-		writeFile(&vecHead[i], dbuf, sockfd);
-	}
-
     close(sockfd);
     return 0;
-
  }
-
-
-
-
-
-
-
-
-
 
 

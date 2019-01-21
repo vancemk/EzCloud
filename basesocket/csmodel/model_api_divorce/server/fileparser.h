@@ -58,7 +58,10 @@ void readAll(DataBuffer & pdbuf, const int pconfd) {
         lenrd = read(pconfd, (void *)pdbuf.getFree(), 
                pdbuf.getFreeLen());
 		pdbuf.pourData(lenrd);
-		if (0 == lenrd || 0 == pdbuf.getFreeLen()){
+		if (0 >= lenrd) {
+			close(pconfd);
+		}
+		if (0 >= lenrd || 0 == pdbuf.getFreeLen()){
 			break;
 		}
     }   
@@ -96,12 +99,12 @@ void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 			pdbuf.drainData(lenrd);
 			tFileSize -= lenrd;
 		}
-		if (tFileSize > 0) {
+		if (tFileSize > 0 && 0 == pdbuf.getFreeLen()) {
 			readAll(pdbuf, pconfd);
 		}
-		if (0 ==  lenrd && tFileSize == 0)
+		if (0 >=  lenrd ||  tFileSize == 0)
 			break;
-		writeAll(pdbuf, pconfd); 
+		readAll(pdbuf, pconfd); 
 	}
 }
 
@@ -124,6 +127,7 @@ void readHead(struct Head & rhead, DataBuffer & pdbuf) {
 	rhead.change= thead -> change;
 	rhead.lastSync = thead -> lastSync;
 	rhead.isNextFile = thead -> isNextFile;
+	pdbuf.drainData(HEAD_SIZE);
 	return;
 }
 

@@ -87,8 +87,10 @@ void writeFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 		lenrd = read(tfd, (void *)pdbuf.getFree(), 
 				pdbuf.getFreeLen());
 		pdbuf.pourData(lenrd);
-		if (0 ==  lenrd && pdbuf.getFreeLen() != 0)
+		if (0 >=  lenrd) {
+			close(tfd);
 			break;
+		}
 		writeAll(pdbuf, pconfd); 
 	}
 }

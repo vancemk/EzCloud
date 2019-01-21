@@ -67,10 +67,11 @@ int main(int argc,char **argv)
 			// printf("dbuf: %s\n", (char *) dbuf.getData());
 			readHead(testHead, dbuf);
 			printHead(&testHead);
-			sleep(3);
 			readFile(&testHead, dbuf, accefd);
-			sleep(3);
-			// dbuf.pourData(leng);
+			if (fcntl(accefd, F_GETFL, 0) < 0){
+				printf("client has closed connection\n");
+				break;
+			}
         }
 
         //若文件的读写已经结束,则关闭文件描述符
