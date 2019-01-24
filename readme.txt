@@ -4,8 +4,16 @@ TCPConnection: writeData()
 Socket: write(const void *data, int len)
 	res = write(_socketHandle, data, len);
 
-2,recv side: how to read data from databuferr?
+2, recv side: how to read data from databuferr?
 TCPConnection: readData()
 	ret = read(_input.getFree(), _input.getFreeLen());
 Socket: read(void *data, int len)
 	res = read(_socketHandle, data, len);
+
+
+Tasklist:
+1, readHead has't read the whole headinfo till the databuffer ends
+
+2, better to make test easier
+
+3, add the glog
