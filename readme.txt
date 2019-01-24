@@ -17,3 +17,5 @@ Tasklist:
 2, better to make test easier
 
 3, add the glog
+
+4, modify Makefile for two module use the same .h file
