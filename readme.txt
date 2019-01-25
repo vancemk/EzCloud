@@ -12,10 +12,10 @@ Socket: read(void *data, int len)
 
 
 Tasklist:
-1, readHead has't read the whole headinfo till the databuffer ends
+1, readHead has't read the whole headinfo till the databuffer ends	【done】
 
 2, better to make test easier
 
 3, add the glog
 
-4, modify Makefile for two module use the same .h file
+4, modify Makefile for two module use the same .h file	【working】
