@@ -20,10 +20,10 @@
 #include<string.h>
 #define SERV_PORT 8000
 
-#include "databuffer.h"
-#include "head.h"
-#include "sockser.h"
-#include "../fileparser.h"
+#include "../Heads/databuffer.h"
+#include "../Heads/head.h"
+#include "../Heads/sockser.h"
+#include "../Heads/fileparser.h"
 
 struct Head;
 int getLisSock();

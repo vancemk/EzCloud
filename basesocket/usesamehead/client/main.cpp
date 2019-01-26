@@ -24,11 +24,11 @@
 #include <string>
 #include <vector>
 
-#include "databuffer.h"
-#include "head.h"
-#include "headhandle.h"
-#include "fileparser.h"
-#include "sockcli.h"
+#include "../Heads/databuffer.h"
+#include "../Heads/head.h"
+#include "../Heads/headhandle.h"
+#include "../Heads/fileparser.h"
+#include "../Heads/sockcli.h"
 
 
 /*
