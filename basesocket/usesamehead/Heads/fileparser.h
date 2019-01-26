@@ -52,7 +52,7 @@ void writeAll(DataBuffer & pdbuf, const int pconfd) {
  *
  *  @return void 
  */
-void readHead1(struct Head & rhead, DataBuffer & pdbuf, const int pconfd) {
+void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd) {
 	if (HEAD_SIZE <= pdbuf.getDataLen()) {
 		copyHead(&rhead, (struct Head *)pdbuf.getData());
 		pdbuf.drainData(HEAD_SIZE);
@@ -164,29 +164,6 @@ void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 			break;
 		readAll(pdbuf, pconfd); 
 	}
-}
-
-
-
-
-/** 
- *  @brief 从缓冲区获取头信息
- *  @param phead	头信息结构指针
- *  @param pdbuf    缓冲区
- *  @param pconfd	打开的连接套接字
- *
- *  @return void 
- */
-void readHead(struct Head & rhead, DataBuffer & pdbuf) {
-	struct Head *thead = (struct Head *)pdbuf.getData();
-	memcpy(rhead.strMd5, thead->strMd5, 40);
-	memcpy(rhead.strPathName, thead->strPathName, 128);
-	rhead.fileSize = thead -> fileSize;
-	rhead.change= thead -> change;
-	rhead.lastSync = thead -> lastSync;
-	rhead.isNextFile = thead -> isNextFile;
-	pdbuf.drainData(HEAD_SIZE);
-	return;
 }
 
 

@@ -40,7 +40,8 @@ void sys_err(const char *ptr,int num)
 #define READ_WRITE_SIZE 1024
 using namespace std;
 
-void writeAll(DataBuffer & pdbuf, const int pconfd) ;
+void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd);
+void writeFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd);
 int main(int argc,char **argv)
  {
 
@@ -56,11 +57,12 @@ int main(int argc,char **argv)
 	iterateDir(argv[1], vecPath);
 	getHeadInfo(vecHead, vecPath);
 	
-	for (auto i=0; i<3000; i++){
-		vecHead[0].isNextFile = i;
-		printHead(&vecHead[0]);
-		writeHead(&vecHead[0], dbuf, sockfd);
-		sleep(2);
+	for (ulong i=0; i<vecHead.size(); i++){
+		vecHead[i].isNextFile = i;
+		printHead(&vecHead[i]);
+		writeHead(&vecHead[i], dbuf, sockfd);
+		writeFile(&vecHead[i], dbuf, sockfd);
+		sleep(1);
 	}
 
     close(sockfd);
