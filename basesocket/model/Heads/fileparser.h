@@ -21,6 +21,8 @@
 
 #define HEAD_SIZE 192
 
+void readAll(DataBuffer & pdbuf, const int pconfd) ;
+
 
 /** 
  *  @brief 将缓冲区所有数据写入套接字
@@ -34,11 +36,67 @@ void writeAll(DataBuffer & pdbuf, const int pconfd) {
     while (1) {
         lenwt = write(pconfd, (void *)pdbuf.getData(), 
                pdbuf.getDataLen());
-        pdbuf.stripData(lenwt);
+		printf("func writeAll write: %d\n", lenwt);
+        pdbuf.drainData(lenwt);
         if(0 == pdbuf.getDataLen())
             break;
     }   
-}   
+}  
+
+
+/** 
+ *  @brief 从缓冲区获取头信息
+ *  @param phead	头信息结构指针
+ *  @param pdbuf    缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
+void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd) {
+	if (HEAD_SIZE <= pdbuf.getDataLen()) {
+		copyHead(&rhead, (struct Head *)pdbuf.getData());
+		pdbuf.drainData(HEAD_SIZE);
+		return;
+	}
+	char tbuf[HEAD_SIZE];
+	int offset = pdbuf.getDataLen();
+	memcpy(tbuf, (void *)pdbuf.getData(), pdbuf.getDataLen());
+	pdbuf.clear();
+	readAll(pdbuf, pconfd);
+	memcpy(tbuf+offset, (void *)pdbuf.getData(), HEAD_SIZE-offset);
+	copyHead(&rhead, (struct Head*)tbuf);
+	pdbuf.drainData(HEAD_SIZE-offset);
+	return;
+}
+
+
+
+
+/** 
+ *  @brief 向缓冲区写入头信息
+ *  @param phead	头信息结构指针
+ *  @param pdbuf    缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
+void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
+	if (pdbuf.getFreeLen() < 0){
+		exit(-1);
+	}
+	int offset = pdbuf.getFreeLen() >= HEAD_SIZE ? HEAD_SIZE : pdbuf.getFreeLen();
+	if (pdbuf.getFreeLen() >= HEAD_SIZE) {
+		pdbuf.writeBytes(phead, HEAD_SIZE);	
+		return;
+	}
+	else {
+		pdbuf.writeBytes(phead, offset);
+	}
+	writeAll(pdbuf, pconfd); 
+	pdbuf.writeBytes((char *)phead+offset, HEAD_SIZE-offset);
+	return;
+}
+
 
 
 
@@ -110,54 +168,6 @@ void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 
 
 
-
-/** 
- *  @brief 从缓冲区获取头信息
- *  @param phead	头信息结构指针
- *  @param pdbuf    缓冲区
- *  @param pconfd	打开的连接套接字
- *
- *  @return void 
- */
-void readHead(struct Head & rhead, DataBuffer & pdbuf) {
-	struct Head *thead = (struct Head *)pdbuf.getData();
-	memcpy(rhead.strMd5, thead->strMd5, 40);
-	memcpy(rhead.strPathName, thead->strPathName, 128);
-	rhead.fileSize = thead -> fileSize;
-	rhead.change= thead -> change;
-	rhead.lastSync = thead -> lastSync;
-	rhead.isNextFile = thead -> isNextFile;
-	pdbuf.drainData(HEAD_SIZE);
-	return;
-}
-
-
-/** 
- *  @brief 向缓冲区写入头信息
- *  @param phead	头信息结构指针
- *  @param pdbuf    缓冲区
- *  @param pconfd	打开的连接套接字
- *
- *  @return void 
- */
-void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
-	if (pdbuf.getFreeLen() < 0){
-		exit(-1);
-	}
-	int offset = pdbuf.getFreeLen() >= HEAD_SIZE ? HEAD_SIZE : pdbuf.getFreeLen();
-	if (pdbuf.getFreeLen() >= HEAD_SIZE) {
-		pdbuf.writeBytes(phead, HEAD_SIZE);	
-		return;
-	}
-	else {
-		pdbuf.writeBytes(phead, offset);
-	}
-	writeAll(pdbuf, pconfd); 
-	pdbuf.writeBytes(phead+offset, HEAD_SIZE-offset);
-	return;
-}
-
-
 /** 
  *  @brief 向缓冲区写入文件信息
  *  @param phead	头信息结构指针
@@ -178,8 +188,10 @@ void writeFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 		lenrd = read(tfd, (void *)pdbuf.getFree(), 
 				pdbuf.getFreeLen());
 		pdbuf.pourData(lenrd);
-		if (0 ==  lenrd && pdbuf.getFreeLen() != 0)
+		if (0 >=  lenrd) {
+			close(tfd);
 			break;
+		}
 		writeAll(pdbuf, pconfd); 
 	}
 }

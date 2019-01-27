@@ -20,18 +20,20 @@
 #include<string.h>
 #define SERV_PORT 8000
 
-#include "databuffer.h"
-#include "head.h"
-#include "sockser.h"
-#include "fileparser.h"
+#include "../Heads/databuffer.h"
+#include "../Heads/head.h"
+#include "../Heads/sockser.h"
+#include "../Heads/fileparser.h"
 
 struct Head;
 int getLisSock();
 void sys_err(const char *ptr,int num);
+void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd);
+void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd);
 
-#define READ_WRITE_SIZE 8192
+#define READ_WRITE_SIZE 1024
 
-int main(int argc,char **argv)
+int main(void)
 {
     signal(SIGPIPE,SIG_IGN);
     int sockfd = getLisSock();
@@ -61,13 +63,14 @@ int main(int argc,char **argv)
             else
                 sys_err("accept",-4);
         }
+		readAll(dbuf, accefd);
         while(1)
         {
-			readAll(dbuf, accefd);
 			// printf("dbuf: %s\n", (char *) dbuf.getData());
-			readHead(testHead, dbuf);
+			readHead(testHead, dbuf, accefd);
 			printHead(&testHead);
 			readFile(&testHead, dbuf, accefd);
+			sleep(1);
 			if (fcntl(accefd, F_GETFL, 0) < 0){
 				printf("client has closed connection\n");
 				break;

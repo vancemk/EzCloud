@@ -23,18 +23,15 @@ void printHead(struct Head *phead){
 	printf("phead->isNextFile: %d\n\n", phead->isNextFile);
 }
 
-struct Head getHead() {
-	struct Head temp;
-	memcpy(temp.strMd5," 9403e3a5a8fd7b698553e9f0b711cf8d", 32);
-	memcpy(temp.strPathName, "/home/Git/EzCloud/databuffer/test_void_convert_struct/databuffer.h", 66);
-	temp.fileSize = 10822;
-	temp.change = 1542813349;
-	temp.lastSync =  0;
-	return temp;
+struct Head * copyHead(struct Head * lhead, struct Head * rhead) {
+	memcpy(lhead->strMd5, rhead->strMd5, 40);
+	memcpy(lhead->strPathName, rhead->strPathName, 128);
+	lhead->fileSize = rhead -> fileSize;
+	lhead->change= rhead -> change;
+	lhead->lastSync = rhead -> lastSync;
+	lhead->isNextFile = rhead -> isNextFile;
+
+	return lhead;
 }
 
-
-
-
 #endif
-

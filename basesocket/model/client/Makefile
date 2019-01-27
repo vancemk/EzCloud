@@ -2,7 +2,7 @@ OBJS = main.cpp
 
 CXX = g++
 
-HEADER_DIR = -I .*h
+HEADER_DIR = -I .*h ../Heads/*.h
 
 TARGET = z_client 
 
@@ -11,3 +11,4 @@ $(TARGET): $(OBJS)
 
 clean:
 	rm -rf *gch
+	rm -rf z_client

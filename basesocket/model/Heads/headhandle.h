@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "head.h"
 #include "md5val.h"
@@ -42,15 +43,16 @@ unsigned long getModTime(const char *sFileName){
 		return 0;
 }
 char *printPwd(){
-	int iSize;
+	int iSize =256;
 	char *pathPwd = (char *)malloc(256);
 	if(!getcwd(pathPwd, iSize-1)){
 		printf("wrong\n");
 	}
+	printf("func printPwd: %s\n", pathPwd);
 	return pathPwd;
 }
 
-void iterateDir(char *inPathName, std::vector<std::string>&vec){
+void iterateDir(const char *inPathName, std::vector<std::string>&vec){
 	struct stat buf;
 	struct dirent *dirp;
 	DIR *dp;
@@ -82,6 +84,33 @@ void iterateDir(char *inPathName, std::vector<std::string>&vec){
 		;
 }
 
+
+/** 
+ *  @brief 补全 strcut Head 中其他信息
+ *  @param vecHeads    文件全路径信息
+ *  @param vecPaths    返回的补全的 struct Heads vector
+ *	@param inWorkPath  传入的工作路径(后期会置为默认)
+ *  @return void 
+ */
+void getHeadInfo1(vector<struct Head>& vecHeads, vector<string>& vecPaths, 
+		const char * dftDepotDir){
+	struct Head tmpHead;
+	for (auto &i:vecPaths){
+		i.replace(0, strlen(dftDepotDir), ".");
+		printf("func getHeadInfo1: i: %s\n", i.c_str());
+		memset(tmpHead.strPathName, 0, 128);
+		memcpy(tmpHead.strPathName, i.c_str(), strlen(i.c_str()));
+		vecHeads.push_back(tmpHead);
+	}
+	for (auto &st:vecHeads){
+		st.fileSize = getFileSize(st.strPathName);
+		st.change = getModTime(st.strPathName);
+		print_md5_sum(st.strPathName, st.strMd5) ;
+		st.lastSync = 0;
+	}
+}
+
+
 void getHeadInfo(vector<struct Head>& vecHeads, const vector<string>& vecPaths){
 	struct Head tmpHead;
 	for (auto &i:vecPaths){
@@ -94,7 +123,6 @@ void getHeadInfo(vector<struct Head>& vecHeads, const vector<string>& vecPaths){
 		st.change = getModTime(st.strPathName);
 		print_md5_sum(st.strPathName, st.strMd5) ;
 		st.lastSync = 0;
-		printHead(&st);
 	}
 }
 

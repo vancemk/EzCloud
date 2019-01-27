@@ -24,11 +24,11 @@
 #include <string>
 #include <vector>
 
-#include "databuffer.h"
-#include "head.h"
-#include "headhandle.h"
-#include "fileparser.h"
-#include "sockcli.h"
+#include "../Heads/databuffer.h"
+#include "../Heads/head.h"
+#include "../Heads/headhandle.h"
+#include "../Heads/fileparser.h"
+#include "../Heads/sockcli.h"
 
 
 /*
@@ -37,32 +37,46 @@ void sys_err(const char *ptr,int num)
     perror(ptr);
     exit(num);
 } */
-
+#define READ_WRITE_SIZE 1024
 using namespace std;
 
+void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd);
+void writeFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd);
 void writeAll(DataBuffer & pdbuf, const int pconfd) ;
-int main(int argc,char **argv)
- {
+int getConSock();
+const char * DEPOTDIR = "./Z_DEPOTDIR/";
 
-	int sockfd = getConSock();
+int main(void)
+ {
+	char bufPwdPath[256];
+	if (!getcwd(bufPwdPath, 256)) {
+		printf("func main: get pwd path wrong, process terminated.\n");
+		exit(-1);
+	}
+	printf("func main: PWD: %s\n\n", bufPwdPath);
+	
+	int tconnfd = getConSock();
 
 	DataBuffer dbuf, dbuf1;
-	dbuf.ensureFree(2048);
+	dbuf.ensureFree(READ_WRITE_SIZE);
 	printf("dbuf.getDataLen: %d\n", dbuf.getDataLen());
 	printf("dbuf.getFreeLen: %d\n", dbuf.getFreeLen());
 	
 	vector<std::string> vecPath;
 	vector<struct Head> vecHead;
-	iterateDir(argv[1], vecPath);
-	getHeadInfo(vecHead, vecPath);
+	iterateDir(DEPOTDIR, vecPath);
+	// getHeadInfo(vecHead, vecPath);
+    getHeadInfo1(vecHead, vecPath, bufPwdPath);
 	
-	for (auto i=0; i<vecHead.size(); i++){
-		printf("write %d\n",i);
-		writeHead(&vecHead[i], dbuf, sockfd);
-		writeFile(&vecHead[i], dbuf, sockfd);
+	for (ulong i=0; i<vecHead.size(); i++){
+		vecHead[i].isNextFile = i;
+		printHead(&vecHead[i]);
+		writeHead(&vecHead[i], dbuf, tconnfd);
+		writeFile(&vecHead[i], dbuf, tconnfd);
+		sleep(1);
 	}
+	writeAll(dbuf, tconnfd);
 
-    close(sockfd);
     return 0;
 
  }

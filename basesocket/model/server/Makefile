@@ -1,6 +1,6 @@
 OBJS = main.cpp
 
-HEADER_DIR = -I .*h
+HEADER_DIR = -I .*h ../Heads/*.h
 
 TARGET = z_server
 
@@ -9,3 +9,4 @@ $(TARGET): $(OBJS)
 
 clean:
 	rm -rf *gch
+	rm -rf z_server

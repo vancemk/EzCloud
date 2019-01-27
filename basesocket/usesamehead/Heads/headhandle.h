@@ -42,11 +42,12 @@ unsigned long getModTime(const char *sFileName){
 		return 0;
 }
 char *printPwd(){
-	int iSize;
+	int iSize =256;
 	char *pathPwd = (char *)malloc(256);
 	if(!getcwd(pathPwd, iSize-1)){
 		printf("wrong\n");
 	}
+	printf("func printPwd: %s\n", pathPwd);
 	return pathPwd;
 }
 
