@@ -14,8 +14,9 @@ Socket: read(void *data, int len)
 Tasklist:
 1, readHead has't read the whole headinfo till the databuffer ends	【done】
 2, better to make test easier
-3, add the glog
+3, add the glog	【abeyance】
 4, modify Makefile for two module use the same .h file	【done】
 5, add the api of "transfer head only", "transfer head and file"	【abeyance】
-6, add the working directory	【working】
-7, Two-way communication
+6, add the working directory	【done】
+7, Two-way communication	【working】
+8, server side check the files to sync
