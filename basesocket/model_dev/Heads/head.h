@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #ifndef HEAD_H_
 #define HEAD_H_
@@ -15,8 +16,13 @@ struct Head {
 };
 
 bool ifHeadsEqual(const struct Head & lochead, const struct Head & rmthead) {
-	return (lochead.strMd5 == rmthead.strMd5 && lochead.strPathName 
-			== rmthead.strPathName =) ? 1 : 0;
+	 if (!strcmp(lochead.strMd5, rmthead.strMd5) && !strcmp(lochead.strPathName, 
+			rmthead.strPathName)) {
+		 return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
@@ -28,6 +34,12 @@ void printHead(struct Head *phead){
 	printf("phead->lastSync: %d\n", phead->lastSync);
 	printf("phead->isNextFile: %d\n\n", phead->isNextFile);
 }
+
+
+void printPathName(struct Head *phead){
+	printf("phead->strPathName: %s\n", phead->strPathName);
+}
+
 
 struct Head * copyHead(struct Head * lhead, struct Head * rhead) {
 	memcpy(lhead->strMd5, rhead->strMd5, 40);

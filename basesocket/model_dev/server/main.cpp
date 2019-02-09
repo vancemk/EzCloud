@@ -25,14 +25,16 @@
 #include "../Heads/head.h"
 #include "../Heads/sockser.h"
 #include "../Heads/fileparser.h"
+#include "../Heads/headhandle.h"
 
 #define READ_WRITE_SIZE 1024
+ #define DEPOTDIR "./Z_DEPOTDIR/"
+
 struct Head;
 int getLisSock();
 void sys_err(const char *ptr,int num);
 void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd);
 void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd);
-
 
 void handler(int sig)  
 {  
@@ -43,6 +45,7 @@ void handler(int sig)
 	 *      * 直到已经waitpid到所有子进程，返回0，才退出循环 */  
     while ( (pid = waitpid(-1, &stat, WNOHANG)) > 0)    
 	    printf("child %d terminated\n", pid);    
+	    printf("catch %d signal\n", sig);    
     return;  
 }
 
@@ -56,7 +59,6 @@ int main(void)
 
     bzero(&cliaddr,sizeof(cliaddr));
 
-
 	//init databuffer
 	DataBuffer dbuf;
 	dbuf.ensureFree(READ_WRITE_SIZE);
@@ -65,6 +67,20 @@ int main(void)
 	// init head
 	struct Head testHead;
 	pid_t pid;
+	
+	char bufPwdPath[256];
+	if (!getcwd(bufPwdPath, 256)) {
+		printf("func main: get pwd path wrong, process terminated.\n");
+		exit(-1);
+	}
+	printf("func main: PWD: %s\n\n", bufPwdPath);
+	std::vector<std::string> vecPath;
+	std::vector<struct Head> vecLocHeads;
+	iterateDir(DEPOTDIR, vecPath);
+	// getHeadInfo(vecHead, vecPath);
+    getHeadInfo1(vecLocHeads, vecPath, bufPwdPath);
+	std::vector<struct Head> vecRmtHeads;
+
     while(1)
     {
         len = sizeof(cliaddr);
@@ -98,16 +114,29 @@ int main(void)
 				close(accefd);
 				break;
 			}
-			printHead(&testHead);
+			//printHead(&testHead);
+			printPathName(&testHead);
 			if (1 == testHead.isNextFile) {
 				readFile(&testHead, dbuf, accefd);
 			}
-			sleep(1);
+
+			struct Head tmphead;
+			vecRmtHeads.push_back(tmphead);
+			copyHead(&vecRmtHeads[vecRmtHeads.size()-1], &testHead);
+			// sleep(1);
 			if (fcntl(accefd, F_GETFL, 0) < 0){
 				log_msg("client has closed connection\n");
 				break;
 			}
         }
+		
+		std::vector<struct Head> vecDiffHeads;
+		cmpVecInfos(vecLocHeads, vecRmtHeads, vecDiffHeads);
+		log_msg("vecLocHeads size: %ld\nvecRmtHeads size: %ld\nvecDiffHeads size: %ld\n", vecLocHeads.size(), vecRmtHeads.size(), vecDiffHeads.size());
+		for (auto &i:vecDiffHeads) {
+			log_msg("vecDiffHeads pathname: %s; isNextfile=%d", i.strPathName, i.isNextFile);
+		}
+
 
         //若文件的读写已经结束,则关闭文件描述符
         if (fcntl(accefd, F_GETFL, 0) < 0){ 

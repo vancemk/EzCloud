@@ -96,14 +96,14 @@ void iterateDir(const char *inPathName, std::vector<std::string>&vec){
 void getHeadInfo1(vector<struct Head>& vecHeads, vector<string>& vecPaths, 
 		const char * dftDepotDir){
 	struct Head tmpHead;
-	for (int i=0; i<vecPaths.size(); i++){
+	for (size_t i=0; i<vecPaths.size(); i++){
 		vecPaths[i].replace(0, strlen(dftDepotDir), ".");
 		printf("func getHeadInfo1: i: %s\n", vecPaths[i].c_str());
 		memset(tmpHead.strPathName, 0, 128);
 		memcpy(tmpHead.strPathName, vecPaths[i].c_str(), strlen(vecPaths[i].c_str()));
 		vecHeads.push_back(tmpHead);
 	}
-	for (int st=0; st<vecHeads.size(); ++st){
+	for (size_t st=0; st<vecHeads.size(); ++st){
 		vecHeads[st].fileSize = getFileSize(vecHeads[st].strPathName);
 		vecHeads[st].change = getModTime(vecHeads[st].strPathName);
 		print_md5_sum(vecHeads[st].strPathName, vecHeads[st].strMd5) ;
@@ -114,12 +114,12 @@ void getHeadInfo1(vector<struct Head>& vecHeads, vector<string>& vecPaths,
 
 void getHeadInfo(vector<struct Head>& vecHeads, const vector<string>& vecPaths){
 	struct Head tmpHead;
-	for (int i=0; i<vecPaths.size(); ++i){
+	for (size_t i=0; i<vecPaths.size(); ++i){
 		memset(tmpHead.strPathName, 0, 128);
 		memcpy(tmpHead.strPathName, vecPaths[i].c_str(), strlen(vecPaths[i].c_str()));
 		vecHeads.push_back(tmpHead);
 	}
-	for (int st=0; st<vecHeads.size(); ++st){
+	for (size_t st=0; st<vecHeads.size(); ++st){
 		vecHeads[st].fileSize = getFileSize(vecHeads[st].strPathName);
 		vecHeads[st].change = getModTime(vecHeads[st].strPathName);
 		print_md5_sum(vecHeads[st].strPathName, vecHeads[st].strMd5) ;
@@ -133,46 +133,52 @@ void getHeadInfo(vector<struct Head>& vecHeads, const vector<string>& vecPaths){
  * @param vecLocHeads  本地文件信息所生成的 struct Head vector
  * @param vecRmtHeads  
  **/
-vector<struct Head> cmpVecInfos(vector<struct Head> & vecLocHeads,
-		vecRmtHeads) {
-	vector<struct Head> vecSrvTask;  // server 端任务 vector
+void cmpVecInfos(vector<struct Head> & vecLocHeads,
+		vector<struct Head> & vecRmtHeads, vector<struct Head> & vecRtDiffs) {
+	vecRtDiffs.clear();
 	bool hasSameHead = false;
-	for(int i=0; i<vecLocHeads.size(); ++i) {
-		for (int h=0; h<vecRmtHeads.size(); ++h) {
-			if (ifHeadsEqual(vecLocHeads[i], vecRmtHeads[h]) {
+	for(size_t i=0; i<vecLocHeads.size(); ++i) {
+		for (size_t h=0; h<vecRmtHeads.size(); ++h) {
+			if (ifHeadsEqual(vecLocHeads[i], vecRmtHeads[h])) {
 				hasSameHead = true;
 				break;
 			}				
 		}
-		if (hasSameHead) {
+		if (!hasSameHead) {
 			vecLocHeads[i].isNextFile = 1;
-			vecSrvTask.push_back(vecLocHeads[i]);
+			struct Head tmphead;
+			vecRtDiffs.push_back(tmphead);
+			copyHead(&vecRtDiffs[vecRtDiffs.size()-1], &vecLocHeads[i]);
+		}
+		else {
+			// log_msg("local and rmt has same head");
+			// printPathName(&vecLocHeads[i]);
+			hasSameHead = false;
 		}
 	}
 	
-	for (int h=0; h<vecRmtHeads.size(); ++h) {
-		for(int i=0; i<vecLocHeads.size(); ++i) {
-			if (ifHeadsEqual(vecLocHeads[i], vecRmtHeads[h]) {
+	for (size_t h=0; h<vecRmtHeads.size(); ++h) {
+		for(size_t i=0; i<vecLocHeads.size(); ++i) {
+			if (ifHeadsEqual(vecLocHeads[i], vecRmtHeads[h])) {
 				hasSameHead = true;
 				break;
 			}
 		}
-		if (hasSameHead) {
+		if (!hasSameHead) {
 			vecLocHeads[h].isNextFile = 0;
-			vecSrvTask.push_back(vecLocHeads[h]);
+			struct Head tmphead;
+			vecRtDiffs.push_back(tmphead);
+			copyHead(&vecRtDiffs[vecRtDiffs.size()-1], &vecRmtHeads[h]);
+		}
+		else {
+			hasSameHead = false;
 		}
 	}
-	
-	return 0;
+	log_msg("vecRtDiffs size: %ld\n", vecRtDiffs.size());
+	// for (auto i:vecRtDiffs){
+	//	log_msg("vecRtDiffs %s", i.strPathName);
+	// }
 }
-
-
-
-
-
-
-
-
 
 
 

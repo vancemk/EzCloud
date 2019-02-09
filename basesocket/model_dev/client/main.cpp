@@ -68,14 +68,16 @@ int main(void)
 	// getHeadInfo(vecHead, vecPath);
     getHeadInfo1(vecHead, vecPath, bufPwdPath);
 	
+	// starts the first task
 	for (ulong i=0; i<vecHead.size(); i++){
-		vecHead[i].isNextFile = i % 2;
+		// vecHead[i].isNextFile = i % 2;
+		vecHead[i].isNextFile = 0;
 		printHead(&vecHead[i]);
 		writeHead(&vecHead[i], dbuf, tconnfd);
-		if (1 == i%2) {
+		if (1 == vecHead[i].isNextFile) {
 			writeFile(&vecHead[i], dbuf, tconnfd);
 		}
-		sleep(1);
+		// sleep(1);
 	}
 	vecHead[0].isNextFile = -1;
 	writeHead(&vecHead[0], dbuf, tconnfd);
