@@ -30,13 +30,6 @@
 #include "../Heads/fileparser.h"
 #include "../Heads/sockcli.h"
 
-
-/*
-void sys_err(const char *ptr,int num)
-{
-    perror(ptr);
-    exit(num);
-} */
 #define READ_WRITE_SIZE 1024
 using namespace std;
 
@@ -81,20 +74,51 @@ int main(void)
 	}
 	vecHead[0].isNextFile = -1;
 	writeHead(&vecHead[0], dbuf, tconnfd);
-
 	writeAll(dbuf, tconnfd);
 
+	// start to receive from server
+	log_msg("start to receive from srv");
+	struct Head testHead;
+	vector<struct Head> vecRtTask; // nextFile=0 rcvd from srv
+	dbuf.clear();
+	log_msg("fcntl tconnfd: %d", fcntl(tconnfd, F_GETFL, 0));
+
+
+	readAll(dbuf, tconnfd, 15);
+	log_msg("dbuf.size %d", dbuf.getDataLen());
+	while(1) {
+		readHead(testHead, dbuf, tconnfd);
+		
+		if (1 == testHead.isNextFile) {
+			readFile(&testHead, dbuf, tconnfd);
+		}
+		else if (0 == testHead.isNextFile) {
+			struct Head tmphead;
+			vecRtTask.push_back(tmphead);
+			copyHead(&vecRtTask[vecRtTask.size()-1], &testHead);
+		}
+		else if (-1 == testHead.isNextFile) {
+			log_msg("rcv task-finished flag");
+			break;
+		}
+
+		printPathName(&testHead);
+		if (fcntl(tconnfd, F_GETFL, 0) < 0) {
+			log_msg("connected fd has closed");
+			break;
+		}
+		else {
+			log_msg("fcntl getfl: %d", fcntl(tconnfd, F_GETFL, 0));
+		}
+		// sleep(1);
+	}
+	log_msg("starts to sleep, ready for last transmission");
 	sleep(65);
 	log_msg("sleep fininshed");
 
     return 0;
 
  }
-
-
-
-
-
 
 
 

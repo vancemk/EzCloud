@@ -115,6 +115,28 @@ void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd) {
 }
 
 
+/** 
+ *  @brief 从缓冲区获取头信息 -- non-block
+ *  @param phead	头信息结构指针
+ *  @param pdbuf    缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
+void readHead1(struct Head & rhead, DataBuffer & pdbuf, const int pconfd) {
+	if (HEAD_SIZE <= pdbuf.getDataLen()) {
+		copyHead(&rhead, (struct Head *)pdbuf.getData());
+		pdbuf.drainData(HEAD_SIZE);
+		return;
+	}
+	char tbuf[HEAD_SIZE];
+	int offset = pdbuf.getDataLen();
+	memcpy(tbuf, (void *)pdbuf.getData(), pdbuf.getDataLen());
+	read(pconfd, (void *) (tbuf + offset), HEAD_SIZE-offset);
+	copyHead(&rhead, (struct Head*)tbuf);
+	return;
+}
+
 
 
 /** 
@@ -163,6 +185,36 @@ void readAll(DataBuffer & pdbuf, const int pconfd) {
         lenrd = read(pconfd, (void *)pdbuf.getFree(), 
                pdbuf.getFreeLen());
 		if (sigsetjmp(jmpbuf, 1) != 0) {
+			// log_msg("sigsetjmp test");
+			break;
+		}
+		pdbuf.pourData(lenrd);
+		if (0 >= lenrd || 0 == pdbuf.getFreeLen()){
+			break;
+		}
+    }   
+}   
+
+
+/** 
+ *  @brief 从套接字读入数据填满缓冲区
+ *  @param pdbuf	缓冲区
+ *  @param pconfd	打开的连接套接字
+ *
+ *  @return void 
+ */
+void readAll(DataBuffer & pdbuf, const int pconfd,
+		const int waitseconds) {
+	signal(SIGALRM, alarmHandler);
+    int lenrd = 0;
+	if (0 == pdbuf.getFreeLen() || 0 != pdbuf.getDataLen()){
+		return;
+	}
+    while (1) {
+		alarm(waitseconds);
+        lenrd = read(pconfd, (void *)pdbuf.getFree(), 
+               pdbuf.getFreeLen());
+		if (sigsetjmp(jmpbuf, 2) != 0) {
 			log_msg("sigsetjmp test");
 			break;
 		}
@@ -172,6 +224,7 @@ void readAll(DataBuffer & pdbuf, const int pconfd) {
 		}
     }   
 }   
+
 
 
 

@@ -111,7 +111,6 @@ int main(void)
 			readHead(testHead, dbuf, accefd);
 			if (testHead.isNextFile == -1) {
 				log_msg("rcv task-finished flag");
-				close(accefd);
 				break;
 			}
 			//printHead(&testHead);
@@ -132,11 +131,21 @@ int main(void)
 		
 		std::vector<struct Head> vecDiffHeads;
 		cmpVecInfos(vecLocHeads, vecRmtHeads, vecDiffHeads);
-		log_msg("vecLocHeads size: %ld\nvecRmtHeads size: %ld\nvecDiffHeads size: %ld\n", vecLocHeads.size(), vecRmtHeads.size(), vecDiffHeads.size());
-		for (auto &i:vecDiffHeads) {
-			log_msg("vecDiffHeads pathname: %s; isNextfile=%d", i.strPathName, i.isNextFile);
-		}
+		log_msg("vecLocHeads size: %ld\nvecRmtHeads size: %ld\nvecDiffHeads \
+				size: %ld\n", vecLocHeads.size(), vecRmtHeads.size(), vecDiffHeads.size());
 
+		// start write to client
+		dbuf.clear();
+		for (auto &i:vecDiffHeads) {
+			writeHead(&i, dbuf, accefd);
+	        if (1 == i.isNextFile) {
+	            writeFile(&i, dbuf, accefd);
+		    }
+		}
+		vecDiffHeads[0].isNextFile = -1;
+		writeHead(&vecDiffHeads[0], dbuf, accefd);
+		writeAll(dbuf, accefd);
+		sleep(60);
 
         //若文件的读写已经结束,则关闭文件描述符
         if (fcntl(accefd, F_GETFL, 0) < 0){ 
