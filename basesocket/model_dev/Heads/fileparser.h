@@ -81,7 +81,6 @@ void writeAll(DataBuffer & pdbuf, const int pconfd) {
     while (1) {
         lenwt = write(pconfd, (void *)pdbuf.getData(), 
                pdbuf.getDataLen());
-		printf("func writeAll write: %d\n", lenwt);
         pdbuf.drainData(lenwt);
         if(0 == pdbuf.getDataLen())
             break;
@@ -151,6 +150,7 @@ void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 	if (pdbuf.getFreeLen() < 0){
 		exit(-1);
 	}
+	log_msg("send Head: %s", phead->strPathName);
 	int offset = pdbuf.getFreeLen() >= HEAD_SIZE ? HEAD_SIZE : pdbuf.getFreeLen();
 	if (pdbuf.getFreeLen() >= HEAD_SIZE) {
 		pdbuf.writeBytes(phead, HEAD_SIZE);	
@@ -244,6 +244,7 @@ void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 		log_msg("create dir: %s failed", phead->strPathName);
 		exit(-1);
 	}
+	log_msg("recv file: %s", phead->strPathName);
 	int tfd = open(phead->strPathName, O_CREAT | O_WRONLY);
 	ulong tFileSize = (ulong)phead->fileSize;
 	int lenrd = 0;
@@ -285,6 +286,7 @@ void writeFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 	if (pdbuf.getFreeLen() < 0){
 		exit(-1);
 	}
+	log_msg("send file: %s", phead->strPathName);
 	int tfd = open(phead->strPathName, O_RDONLY);
 	int lenrd = 0;
 	if (tfd < 0)
@@ -301,10 +303,54 @@ void writeFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 	}
 }
 
+/**
+ *
+ *
+ **/
+void writeTasks(std::vector<struct Head>& vecTasks, DataBuffer & pdbuf,
+		const int pconfd) {
+	pdbuf.clear();
+	for (ulong i=0; i<vecTasks.size(); i++){
+		// vecTasks[i].isNextFile = 0;
+		writeHead(&vecTasks[i], pdbuf, pconfd);
+		if (1 == vecTasks[i].isNextFile) {
+			writeFile(&vecTasks[i], pdbuf, pconfd);
+		}   
+	}   
+	vecTasks[0].isNextFile = -1; 
+	writeHead(&vecTasks[0], pdbuf, pconfd);
+	writeAll(pdbuf, pconfd);
+}
 
-
-
-
-
+/**
+ *
+ *
+ **/
+void readTasks(std::vector<struct Head>& vecTasks, DataBuffer & pdbuf,
+		const int pconfd) {
+	pdbuf.clear();
+    readAll(pdbuf, pconfd);
+	struct Head testHead;
+	while(1) {
+		readHead(testHead, pdbuf, pconfd);
+	
+		if (1 == testHead.isNextFile) {
+			readFile(&testHead, pdbuf, pconfd);
+		}   
+		else if (0 == testHead.isNextFile ||  2 == testHead.isNextFile) {
+			if (2 == testHead.isNextFile) {
+				testHead.isNextFile = 1;
+			}
+			struct Head tmphead;
+			vecTasks.push_back(tmphead);
+			copyHead(&vecTasks[vecTasks.size()-1], &testHead);
+		}   
+		else if (-1 == testHead.isNextFile) {
+			log_msg("rcv task-finished flag");
+			break;
+		}   
+													        // sleep(1);
+	}												//     }
+}
 
 #endif
