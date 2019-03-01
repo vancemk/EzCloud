@@ -151,8 +151,6 @@ void cmpVecInfos(vector<struct Head> & vecLocHeads,
 			copyHead(&vecRtDiffs[vecRtDiffs.size()-1], &vecLocHeads[i]);
 		}
 		else {
-			// log_msg("local and rmt has same head");
-			// printPathName(&vecLocHeads[i]);
 			hasSameHead = false;
 		}
 	}
@@ -165,7 +163,7 @@ void cmpVecInfos(vector<struct Head> & vecLocHeads,
 			}
 		}
 		if (!hasSameHead) {
-			vecLocHeads[h].isNextFile = 0;
+			vecRmtHeads[h].isNextFile = 0;
 			struct Head tmphead;
 			vecRtDiffs.push_back(tmphead);
 			copyHead(&vecRtDiffs[vecRtDiffs.size()-1], &vecRmtHeads[h]);
