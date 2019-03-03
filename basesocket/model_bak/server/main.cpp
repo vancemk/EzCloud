@@ -32,6 +32,7 @@
 
 struct Head;
 int getLisSock();
+void sys_err(const char *ptr,int num);
 void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd);
 void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd);
 
@@ -78,7 +79,8 @@ int main(void)
 	iterateDir(DEPOTDIR, vecPath);
 	// getHeadInfo(vecHead, vecPath);
     getHeadInfo1(vecLocHeads, vecPath, bufPwdPath);
-	std::vector<struct Head> vecRmtHeads;
+	std::vector<struct Head> vecRmtHeads, vecDiffHeads;
+	 
 
     while(1)
     {
@@ -103,77 +105,20 @@ int main(void)
 		}
 
 		close(sockfd);
-		
-		// start the first task
-		log_msg("start the first task");
-		readAll(dbuf, accefd);
-        while(1)
-        {
-			readHead1(testHead, dbuf, accefd);
-			if (testHead.isNextFile == -1) {
-				log_msg("rcv task-finished flag");
-				break;
-			}
 
-			if (1 == testHead.isNextFile) {
-				readFile(&testHead, dbuf, accefd);
-			}
-				
-			struct Head tmphead;
-			vecRmtHeads.push_back(tmphead);
-			copyHead(&vecRmtHeads[vecRmtHeads.size()-1], &testHead);
-			// sleep(1);
-			if (fcntl(accefd, F_GETFL, 0) < 0){
-				log_msg("client has closed connection\n");
-				break;
-			}
-        }
-		
-		std::vector<struct Head> vecDiffHeads;
+		readTasks(vecRmtHeads, dbuf, accefd);
+
 		cmpVecInfos(vecLocHeads, vecRmtHeads, vecDiffHeads);
 		log_msg("vecLocHeads size: %ld\nvecRmtHeads size: %ld\nvecDiffHeads \
-				size: %ld\n", vecLocHeads.size(), vecRmtHeads.size(), vecDiffHeads.size());
+				size: %ld\n", vecLocHeads.size(), vecRmtHeads.size(), 
+				vecDiffHeads.size());
 
-		// start the second task
-		dbuf.clear();
-		for (auto &i:vecDiffHeads) {
-			writeHead(&i, dbuf, accefd);
-	        if (1 == i.isNextFile) {
-	            writeFile(&i, dbuf, accefd);
-		    }
-		}
-		vecDiffHeads[0].isNextFile = -1;
-		writeHead(&vecDiffHeads[0], dbuf, accefd);
-		writeAll(dbuf, accefd);
-
-		log_msg("starts to sleep, ready for last transmission");
-		dbuf.clear();
-		readAll(dbuf, accefd);
-		while (1) {
-			readHead1(testHead, dbuf, accefd);
-
-			if (1 == testHead.isNextFile) {
-				readFile(&testHead, dbuf, accefd);
-			}
-			else if (-1 == testHead.isNextFile) {
-				log_msg("rcv task-finished flag");	
-				break;
-			}
-			
-	        if (fcntl(accefd, F_GETFL, 0) < 0) {
-	            log_msg("connected fd has closed");
-	            break;
-			}
-		}
-        //若文件的读写已经结束,则关闭文件描述符
-        if (fcntl(accefd, F_GETFL, 0) < 0){ 
-			log_msg("client has closed connection\n");
-		    break;
-		}
-		else { 
-			close(accefd);
-		}
-		break;
+		// start write to client
+		writeTasks(vecDiffHeads, dbuf, accefd);
+	
+		sleep(4);
+		readTasks(vecRmtHeads, dbuf, accefd);
+		close(accefd);
 
     }
     close(sockfd);

@@ -58,78 +58,26 @@ int main(void)
 	vector<std::string> vecPath;
 	vector<struct Head> vecHead;
 	iterateDir(DEPOTDIR, vecPath);
-	// getHeadInfo(vecHead, vecPath);
     getHeadInfo1(vecHead, vecPath, bufPwdPath);
 	
 	// starts the first task
-	for (ulong i=0; i<vecHead.size(); i++){
-		// vecHead[i].isNextFile = i % 2;
-		vecHead[i].isNextFile = 0;
-		// printHead(&vecHead[i]);
-		writeHead(&vecHead[i], dbuf, tconnfd);
-		if (1 == vecHead[i].isNextFile) {
-			writeFile(&vecHead[i], dbuf, tconnfd);
-		}
-		// sleep(1);
-	}
-	vecHead[0].isNextFile = -1;
-	writeHead(&vecHead[0], dbuf, tconnfd);
-	writeAll(dbuf, tconnfd);
+	writeTasks(vecHead, dbuf, tconnfd);
 
-	// start the second task
-	log_msg("start the second task");
-	struct Head testHead;
+	// start to receive from server
+	log_msg("start to receive from srv");
 	vector<struct Head> vecRtTask; // nextFile=0 rcvd from srv
-	dbuf.clear();
-	log_msg("fcntl tconnfd: %d", fcntl(tconnfd, F_GETFL, 0));
-
-
-	readAll(dbuf, tconnfd);
-	log_msg("dbuf.size %d", dbuf.getDataLen());
-	while(1) {
-		readHead1(testHead, dbuf, tconnfd);
-		
-		if (1 == testHead.isNextFile) {
-			readFile(&testHead, dbuf, tconnfd);
-		}
-		else if (0 == testHead.isNextFile) {
-			struct Head tmphead;
-			vecRtTask.push_back(tmphead);
-			copyHead(&vecRtTask[vecRtTask.size()-1], &testHead);
-		}
-		else if (-1 == testHead.isNextFile) {
-			log_msg("rcv task-finished flag");
-			break;
-		}
-
-		printPathName(&testHead);
-		if (fcntl(tconnfd, F_GETFL, 0) < 0) {
-			log_msg("connected fd has closed");
-			break;
-		}
-		// sleep(1);
-	}
-
-	// start the third task
-	log_msg("start the third task");
-	dbuf.clear();
-	for (auto &i:vecRtTask) {
-		// printHead(&i);
-		i.isNextFile = 1;
-		writeHead(&i, dbuf, tconnfd);
-		writeFile(&i, dbuf, tconnfd);
-	}
-	vecRtTask[0].isNextFile = -1;
-	writeHead(&vecRtTask[0], dbuf, tconnfd);
-	writeAll(dbuf, tconnfd);
+	sleep(3);
+	readTasks(vecRtTask, dbuf, tconnfd);
 
 	log_msg("starts to sleep, ready for last transmission");
-	close(tconnfd);
-	log_msg("sleep fininshed");
+	log_msg("vecRtTask.size: %ld", vecRtTask.size());
+	writeTasks(vecRtTask, dbuf, tconnfd);
 
     return 0;
 
  }
+
+
 
 
 

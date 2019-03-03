@@ -49,7 +49,6 @@ char *printPwd(){
 	if(!getcwd(pathPwd, iSize-1)){
 		printf("wrong\n");
 	}
-	// printf("func printPwd: %s\n", pathPwd);
 	return pathPwd;
 }
 
@@ -98,7 +97,6 @@ void getHeadInfo1(vector<struct Head>& vecHeads, vector<string>& vecPaths,
 	struct Head tmpHead;
 	for (size_t i=0; i<vecPaths.size(); i++){
 		vecPaths[i].replace(0, strlen(dftDepotDir), ".");
-		// printf("func getHeadInfo1: i: %s\n", vecPaths[i].c_str());
 		memset(tmpHead.strPathName, 0, 128);
 		memcpy(tmpHead.strPathName, vecPaths[i].c_str(), strlen(vecPaths[i].c_str()));
 		vecHeads.push_back(tmpHead);
@@ -108,6 +106,7 @@ void getHeadInfo1(vector<struct Head>& vecHeads, vector<string>& vecPaths,
 		vecHeads[st].change = getModTime(vecHeads[st].strPathName);
 		print_md5_sum(vecHeads[st].strPathName, vecHeads[st].strMd5) ;
 		vecHeads[st].lastSync = 0;
+		vecHeads[st].isNextFile = 0;
 	}
 }
 
@@ -151,8 +150,6 @@ void cmpVecInfos(vector<struct Head> & vecLocHeads,
 			copyHead(&vecRtDiffs[vecRtDiffs.size()-1], &vecLocHeads[i]);
 		}
 		else {
-			// log_msg("local and rmt has same head");
-			// printPathName(&vecLocHeads[i]);
 			hasSameHead = false;
 		}
 	}
@@ -165,7 +162,7 @@ void cmpVecInfos(vector<struct Head> & vecLocHeads,
 			}
 		}
 		if (!hasSameHead) {
-			vecLocHeads[h].isNextFile = 0;
+			vecRmtHeads[h].isNextFile = 2;
 			struct Head tmphead;
 			vecRtDiffs.push_back(tmphead);
 			copyHead(&vecRtDiffs[vecRtDiffs.size()-1], &vecRmtHeads[h]);
