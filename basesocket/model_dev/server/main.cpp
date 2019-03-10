@@ -64,8 +64,6 @@ int main(void)
 	dbuf.ensureFree(READ_WRITE_SIZE);
 	printf("db.getFreeLen(): %d\n", dbuf.getFreeLen());
 
-	// init head
-	struct Head testHead;
 	pid_t pid;
 	
 	char bufPwdPath[256];

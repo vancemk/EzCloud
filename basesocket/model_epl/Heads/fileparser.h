@@ -100,6 +100,9 @@ void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd) {
 	if (HEAD_SIZE <= pdbuf.getDataLen()) {
 		copyHead(&rhead, (struct Head *)pdbuf.getData());
 		pdbuf.drainData(HEAD_SIZE);
+		if (-1 != rhead.isNextFile){
+			log_msg("recv head: %s", rhead.strPathName);
+		}
 		return;
 	}
 	char tbuf[HEAD_SIZE];
@@ -109,6 +112,9 @@ void readHead(struct Head & rhead, DataBuffer & pdbuf, const int pconfd) {
 	readAll(pdbuf, pconfd);
 	memcpy(tbuf+offset, (void *)pdbuf.getData(), HEAD_SIZE-offset);
 	copyHead(&rhead, (struct Head*)tbuf);
+	if (-1 != rhead.isNextFile){
+		log_msg("recv head: %s", rhead.strPathName);
+	}
 	pdbuf.drainData(HEAD_SIZE-offset);
 	return;
 }
@@ -150,7 +156,7 @@ void writeHead(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 	if (pdbuf.getFreeLen() < 0){
 		exit(-1);
 	}
-	log_msg("send Head: %s", phead->strPathName);
+	log_msg("send Head: %d %s", phead->isNextFile, phead->strPathName);
 	int offset = pdbuf.getFreeLen() >= HEAD_SIZE ? HEAD_SIZE : pdbuf.getFreeLen();
 	if (pdbuf.getFreeLen() >= HEAD_SIZE) {
 		pdbuf.writeBytes(phead, HEAD_SIZE);	
@@ -244,7 +250,7 @@ void readFile(struct Head * phead, DataBuffer & pdbuf, const int pconfd) {
 		log_msg("create dir: %s failed", phead->strPathName);
 		exit(-1);
 	}
-	log_msg("recv file: %s", phead->strPathName);
+	
 	int tfd = open(phead->strPathName, O_CREAT | O_WRONLY);
 	ulong tFileSize = (ulong)phead->fileSize;
 	int lenrd = 0;
@@ -317,8 +323,11 @@ void writeTasks(std::vector<struct Head>& vecTasks, DataBuffer & pdbuf,
 			writeFile(&vecTasks[i], pdbuf, pconfd);
 		}   
 	}   
-	vecTasks[0].isNextFile = -1; 
-	writeHead(&vecTasks[0], pdbuf, pconfd);
+	struct Head tmp;
+	tmp.isNextFile = -1; 
+	strcpy(tmp.strPathName, "empty head");
+	strcpy(tmp.strMd5, "empty head");
+	writeHead(&tmp, pdbuf, pconfd);
 	writeAll(pdbuf, pconfd);
 }
 
