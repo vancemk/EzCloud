@@ -1,0 +1,43 @@
+func main: PWD: /home/git/EzCloud/basesocket/model_epl/client
+
+dbuf.getDataLen: 0
+dbuf.getFreeLen: 1024
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/After_Twenty_Years.txt
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/after.txt
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/pictures/微信图片_20170810223742.jpg
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/pictures/mao.JPG
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/deprecated-list.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/help-doc.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/index.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/overview-frame.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/overview-summary.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/overview-tree.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/allclasses-frame.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/allclasses-noframe.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/lucene_highlighter/constant-values.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/queryparser/constant-values.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/queryparser/deprecated-list.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/queryparser/help-doc.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/queryparser/allclasses-frame.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/queryparser/allclasses-noframe.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/bac/Years.txt
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/bac/the.txt
+[../Heads/fileparser.h:153][writeHead]: send Head: empty head
+[main.cpp:67][main]: start to receive from srv
+[../Heads/fileparser.h:247][readFile]: recv file: ./Z_DEPOTDIR/mhtml/abx.mhtml
+[../Heads/fileparser.h:247][readFile]: recv file: ./Z_DEPOTDIR/mhtml/Linux下Redis的安装和部署_-_humor1314_-_博客园.mhtml
+[../Heads/fileparser.h:247][readFile]: recv file: ./Z_DEPOTDIR/mhtml/编译时缺少openssl_md5.h该怎么处理_百度知道.mhtml
+[../Heads/fileparser.h:51][createDir]: file already exists
+[../Heads/fileparser.h:247][readFile]: recv file: ./Z_DEPOTDIR/docs/queryparser/allclasses-frame.html
+[../Heads/fileparser.h:352][readTasks]: rcv task-finished flag
+[main.cpp:72][main]: starts to sleep, ready for last transmission
+[main.cpp:73][main]: vecRtTask.size: 4
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/queryparser/allclasses-frame.html
+[../Heads/fileparser.h:289][writeFile]: send file: ./Z_DEPOTDIR/docs/queryparser/allclasses-frame.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/docs/queryparser/allclasses-noframe.html
+[../Heads/fileparser.h:289][writeFile]: send file: ./Z_DEPOTDIR/docs/queryparser/allclasses-noframe.html
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/bac/Years.txt
+[../Heads/fileparser.h:289][writeFile]: send file: ./Z_DEPOTDIR/bac/Years.txt
+[../Heads/fileparser.h:153][writeHead]: send Head: ./Z_DEPOTDIR/bac/the.txt
+[../Heads/fileparser.h:289][writeFile]: send file: ./Z_DEPOTDIR/bac/the.txt
+[../Heads/fileparser.h:153][writeHead]: send Head: empty head
